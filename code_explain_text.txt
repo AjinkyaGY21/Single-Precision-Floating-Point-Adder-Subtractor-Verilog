@@ -1,0 +1,26 @@
+CODE EXPLANATION:
+The code takes three inputs: a and b are the two 32-bit floating-point numbers to be added or subtracted, and add_sub is a control signal that determines whether to perform addition (when add_sub is 1) or subtraction (when add_sub is 0). The output is a 32-bit floating-point number representing the result of the addition or subtraction.
+
+First, some constants are defined to represent the widths of various fields in the floating-point representation. For single-precision floating-point numbers, the exponent field has a width of 8 bits and the fraction field has a width of 23 bits. An intermediate width of 26 bits is used to represent the shifted fractions during the addition or subtraction.
+
+Next, the sign, exponent, and fraction fields are extracted from the inputs a and b. The difference between the two exponents is computed and its absolute value is taken. The fractions of a and b are shifted left by 3 bits to make room for rounding. The fraction with the smaller exponent is then shifted right by an amount equal to the absolute value of the exponent difference. This aligns the radix points of the two fractions so that they can be added or subtracted.
+
+The aligned fractions are then added or subtracted depending on the value of add_sub and whether the signs of a and b are equal. If add_sub is 1 and the signs are equal, or if add_sub is 0 and the signs are different, then addition is performed. Otherwise, subtraction is performed. The sign of the result is determined based on whether addition or subtraction was performed and whether there was a carry out from the addition or subtraction.
+
+Next, several special cases are handled. If either input is NaN or infinity (indicated by an exponent of 255), then the result is set to NaN or infinity as appropriate. If the absolute value of the exponent difference is greater than or equal to 29 (the width of the intermediate representation), or if both fractions are zero after shifting, then the result is set to zero with the appropriate sign.
+
+Otherwise, a normal result is computed by finding the position of the most significant bit in the magnitude of the sum or difference. The magnitude is then shifted right until its most significant bit is in position 24 (the position just to the left of where it would be in a normalized floating-point number). The shifted magnitude is rounded to 23 bits using round-to-nearest-even rounding. The exponent of the result is set to one plus the larger of the two input exponents minus the shift amount.
+
+Finally, if overflow occurs during rounding (indicated by a carry out from bit 23), then the rounded magnitude is shifted right by one bit and its least significant bit is set to zero. The exponent of the result is incremented by one.
+
+
+-> special cases such as NaN (Not a Number), infinity and denormalized numbers. You may want to add additional logic to handle these cases.
+The design uses simple truncation for rounding the result. You may want to implement a more sophisticated rounding method such as round-to-nearest or round-to-nearest-even.
+The design does not have any error checking or reporting mechanism. You may want to add additional logic to detect and report errors such as overflow and underflow.
+
+
+-> NaN (Not a Number) is a special value that represents the result of an undefined or invalid operation such as the division of zero by zero. If one or both of the input operands to the adder or subtractor are NaN, then the result will also be NaN.
+
+-> Infinity is a special value that represents a number that is greater than any finite number. If the result of an addition or subtraction operation is too large to be represented by the largest finite number, then the result will be infinity. Similarly, if one or both of the input operands are infinity, then the result will also be infinity.
+
+-> A denormalized number is a number that is smaller than the smallest normalized number and is represented using a leading zero in the exponent field and a non-zero mantissa. If the result of an addition or subtraction operation is too small to be represented by the smallest normalized number, then the result will be a denormalized number.
